@@ -19,8 +19,8 @@ class MonitorApp:
             print(f"BIZDATE: {Helper.format_date_yyyymmdd(Helper.get_prev_day(DAY_BEHIND))}")
 
             try:
-                # Pause monitoring window 23:30 - 00:30
-                if (now.hour == 23 and now.minute >= 30) or (now.hour == 0 and now.minute < 30):
+                # Pause monitoring window 23:50 - 00:30
+                if (now.hour == 23 and now.minute >= 50) or (now.hour == 0 and now.minute < 30):
                     print(f"[{now.strftime('%H:%M:%S')}] Paused monitoring window")
                     time.sleep(60)
                     continue

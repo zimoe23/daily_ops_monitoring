@@ -15,18 +15,17 @@ class SLAMonitor:
         self.notifier = NotificationManager()
 
     def update_sheet_status(self):
-        print(f"Updating sheet status at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         nodes: list[Node] = self.sheet.get_nodes()
         instance_data_list = []         # for single-instance nodes (update by node_id)
         hourly_instance_data_list = []  # for multi-instance nodes (update by task_name)
 
         for node in nodes:
             
-            if not node.project_id and not node.node_id:
+            if str(node.project_id).strip() == "" or str(node.node_id).strip() == "":
                 continue
             
             instances: list[Instance] = self.dataworks.get_instances(node.project_id, node.node_id)
-            # print(f"Node: {node.node_name} (ID: {node.node_id}) - Found {len(instances)} instances")
+            
             if not instances:
                 continue
             
