@@ -133,6 +133,7 @@ class SLAMonitor:
         print(f"Checking SLA at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
         nodes: list[Node] = self.sheet.get_nodes()
+        print(f"Total nodes to check: {len(nodes)}")
         breaches = []
         now = datetime.now().hour
 
@@ -154,11 +155,11 @@ class SLAMonitor:
             # Check SLA breach for non-failed nodes
             if now >= sla and status and status != GSHEET_STATUS.SUCCEEDED.value:
                 breaches.append(node)
-
+                
+        print(f"Total breaches found: {len(breaches)}")
         if breaches:
             msg = self.build_table(breaches)
             print("SLA breaches found. Sending notification...")
-            print(msg)
             self.notifier.send(msg)
     
     
