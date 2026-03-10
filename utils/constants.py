@@ -7,8 +7,6 @@ class GSHEET_STATUS(Enum):
     WAITING = "Status_WAIT_TIME"
     FAILED = "Status_FAILURE"
     
-from enum import Enum
-
 class GSHEET_HEADER(Enum):
     NODE_ID = "node_id"
     PROJECT_ID = "project_id"
