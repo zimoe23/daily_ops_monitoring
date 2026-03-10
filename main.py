@@ -29,10 +29,9 @@ class MonitorApp:
 
                 # SLA check: notify once per hour
                 if self.last_sla_hour != now.hour:
-                    print(f"Checking SLA at {now.strftime('%Y-%m-%d %H:%M:%S')}")
                     self.monitor.check_sla()
                     self.last_sla_hour = now.hour
-
+                print(f"Cycle completed at {now.strftime('%Y-%m-%d %H:%M:%S')}")
             except Exception as e:
                 print("Cycle error:", e)
 
