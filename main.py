@@ -12,7 +12,7 @@ class MonitorApp:
         self.last_sla_hour = None
 
     def run(self):
-        subprocess.Popen(["caffeinate", "-dimsu"])
+        # subprocess.Popen(["caffeinate", "-dimsu"])
 
         while True:
             now = Helper.now()

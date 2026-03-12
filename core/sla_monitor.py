@@ -90,10 +90,11 @@ class SLAMonitor:
 
         # Rows for breached nodes only
         for n in breached_nodes:
+            status = n.current_status.replace("Status_", "")
             row = (
                 f"{str(n.node_id).ljust(max_id_width)}   "
                 f"{n.node_name.ljust(max_name_width)}   "
-                f"{n.current_status.ljust(max_status_width)}"
+                f"{status.ljust(max_status_width)}"
             )
             rows.append(row)
 
@@ -109,14 +110,17 @@ class SLAMonitor:
         total_nodes = len(all_nodes)
         succeeded_count = sum(1 for n in all_nodes if n.current_status == GSHEET_STATUS.SUCCEEDED.value)
         failed_count = sum(1 for n in breached_nodes if n.current_status == GSHEET_STATUS.FAILED.value)
+        running_count = sum(1 for n in breached_nodes if n.current_status == GSHEET_STATUS.RUNNING.value)
         not_running_count = sum(1 for n in breached_nodes 
-                                if n.current_status not in [GSHEET_STATUS.SUCCEEDED.value, GSHEET_STATUS.FAILED.value])
+            if n.current_status not in [GSHEET_STATUS.RUNNING.value, GSHEET_STATUS.SUCCEEDED.value, GSHEET_STATUS.FAILED.value])
 
         succeed_percent = round((succeeded_count / total_nodes) * 100) if total_nodes else 0
 
         footer_lines = [f"Total breached node/s: {len(breached_nodes)}"]
         if failed_count:
             footer_lines.append(f"Failed: {failed_count}")
+        if running_count:
+            footer_lines.append(f"Running: {running_count}")
         if not_running_count:
             footer_lines.append(f"Not running: {not_running_count}")
         if succeeded_count:
