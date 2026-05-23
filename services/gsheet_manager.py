@@ -25,7 +25,8 @@ class GoogleSheetManager:
                 node_name=row.get(GSHEET_HEADER.TASK_NAME.value, ""),
                 is_hourly="HOURLY" in node_type.upper(),
                 sla_limit=row.get(GSHEET_HEADER.SLA.value, 0),
-                current_status=row.get(GSHEET_HEADER.STATUS.value, "")
+                current_status=row.get(GSHEET_HEADER.STATUS.value, ""),
+                node_type=node_type
             )
             nodes.append(node)
         return nodes

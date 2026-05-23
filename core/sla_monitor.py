@@ -16,10 +16,15 @@ class SLAMonitor:
 
     def update_sheet_status(self):
         nodes: list[Node] = self.sheet.get_nodes()
+        filtered_nodes = [
+            node for node in nodes
+            if node.current_status != "Status_SUCCESS"
+            and node.node_type != "INSTANCE"
+        ]
         instance_data_list = []         # for single-instance nodes (update by node_id)
         hourly_instance_data_list = []  # for multi-instance nodes (update by task_name)
 
-        for node in nodes:
+        for node in filtered_nodes:
             
             if str(node.project_id).strip() == "" or str(node.node_id).strip() == "":
                 continue
