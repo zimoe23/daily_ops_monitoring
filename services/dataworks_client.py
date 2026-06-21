@@ -5,6 +5,7 @@ from alibabacloud_tea_openapi import models as open_api_models
 from config.settings import AK_ID, AK_SECRET, REGION, DAY_BEHIND
 from utils.helpers import Helper
 from models.instance import Instance
+import time
 
 class DataWorksClient:
 
@@ -46,47 +47,79 @@ class DataWorksClient:
             page_size=100
         )
 
-        response = self.client.list_instances(request)
+        max_retries = 20
+        time.sleep(0.2)
 
-        if response.body.data.instances:
-            for inst in response.body.data.instances:
-                
-                start_time = (
-                    datetime.fromtimestamp(inst.begin_running_time / 1000).strftime('%Y/%m/%d %H:%M')
-                    if inst.begin_running_time else "-"
+        for attempt in range(max_retries):
+            try:
+                print(
+                    f"START API CALL "
+                    f"(attempt {attempt + 1}/{max_retries}) "
+                    f"project_id={project_id}, node_id={node_id}"
                 )
 
-                end_time = (
-                    datetime.fromtimestamp(inst.finish_time / 1000).strftime('%Y/%m/%d %H:%M')
-                    if inst.finish_time else "-"
-                )
+                response = self.client.list_instances(request)
 
-                instance = Instance(
-                    baseline_id=inst.baseline_id,
-                    bizdate=inst.bizdate,
-                    business_id=inst.business_id,
-                    connection=inst.connection,
-                    create_time=inst.create_time,
-                    create_user=inst.create_user,
-                    cyc_time=inst.cyc_time,
-                    dag_id=inst.dag_id,
-                    dag_type=inst.dag_type,
-                    dqc_description=inst.dqc_description,
-                    error_message=inst.error_message,
-                    instance_id=inst.instance_id,
-                    modify_time=inst.modify_time,
-                    node_id=inst.node_id,
-                    node_name=inst.node_name,
-                    param_values=inst.param_values,
-                    priority=inst.priority,
-                    repeatability=inst.repeatability,
-                    status=inst.status,
-                    task_rerun_time=inst.task_rerun_time,
-                    task_type=inst.task_type,
-                    start_time=start_time,
-                    end_time=end_time
-                )
+                print("API CALL SUCCESS")
 
-                results.append(instance)
+                if response.body.data.instances:
+                    for inst in response.body.data.instances:
+
+                        start_time = (
+                            datetime.fromtimestamp(
+                                inst.begin_running_time / 1000
+                            ).strftime('%Y/%m/%d %H:%M')
+                            if inst.begin_running_time else "-"
+                        )
+
+                        end_time = (
+                            datetime.fromtimestamp(
+                                inst.finish_time / 1000
+                            ).strftime('%Y/%m/%d %H:%M')
+                            if inst.finish_time else "-"
+                        )
+
+                        instance = Instance(
+                            baseline_id=inst.baseline_id,
+                            bizdate=inst.bizdate,
+                            business_id=inst.business_id,
+                            connection=inst.connection,
+                            create_time=inst.create_time,
+                            create_user=inst.create_user,
+                            cyc_time=inst.cyc_time,
+                            dag_id=inst.dag_id,
+                            dag_type=inst.dag_type,
+                            dqc_description=inst.dqc_description,
+                            error_message=inst.error_message,
+                            instance_id=inst.instance_id,
+                            modify_time=inst.modify_time,
+                            node_id=inst.node_id,
+                            node_name=inst.node_name,
+                            param_values=inst.param_values,
+                            priority=inst.priority,
+                            repeatability=inst.repeatability,
+                            status=inst.status,
+                            task_rerun_time=inst.task_rerun_time,
+                            task_type=inst.task_type,
+                            start_time=start_time,
+                            end_time=end_time
+                        )
+
+                        results.append(instance)
+
+                return results
+
+            except Exception as e:
+                if "Throttling.User" in str(e):
+                    print(
+                        f"Throttled on attempt {attempt + 1}/{max_retries}. "
+                        f"Retrying in 1 second..."
+                    )
+
+                    if attempt < max_retries - 1:
+                        time.sleep(1)
+                        continue
+
+                raise
 
         return results
